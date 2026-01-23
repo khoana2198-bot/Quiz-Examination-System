@@ -1,0 +1,56 @@
+Subject,Question Content,Option A,Option B,Option C,Option D,Correct Answer,Difficulty
+Mathematics,2 + 2 = ?,3,4,5,6,b,easy
+Mathematics,5 * 5 = ?,20,25,30,35,b,easy
+Mathematics,Square root of 144?,10,11,12,13,c,medium
+Mathematics,10 / 2 = ?,3,4,5,6,c,easy
+Mathematics,15 - 7 = ?,6,7,8,9,c,easy
+Mathematics,3 squared?,6,9,12,15,b,easy
+Mathematics,Angle of a circle?,90,180,270,360,d,easy
+Mathematics,Pi approx value?,3.14,2.14,4.14,3.41,a,medium
+Mathematics,Sides in a triangle?,2,3,4,5,b,easy
+Mathematics,Sides in a square?,3,4,5,6,b,easy
+Physics,Water boils at (C)?,90,100,110,120,b,easy
+Physics,Freezing point of water (C)?,0,10,-10,100,a,easy
+Physics,Speed of sound (m/s)?,343,300,500,1000,a,hard
+Physics,Speed of light (km/s)?,300000,150000,1000,340,a,hard
+Physics,Unit of Force?,Newton,Joule,Watt,Volt,a,medium
+Physics,Unit of Energy?,Newton,Joule,Watt,Volt,b,medium
+Physics,Unit of Power?,Newton,Joule,Watt,Volt,c,medium
+Physics,Gravity on Earth (m/s^2)?,9.8,8.9,10.5,5.6,a,medium
+Physics,Law of Action-Reaction?,Newton 1st,Newton 2nd,Newton 3rd,Einstein,c,medium
+Physics,E=mc^2 scientist?,Bohr,Einstein,Newton,Tesla,b,easy
+Chemistry,Symbol for Hydrogen?,Hy,H,Ho,He,b,easy
+Chemistry,Symbol for Oxygen?,O,Ox,Og,On,a,easy
+Chemistry,H2O is?,Salt,Water,Acid,Base,b,easy
+Chemistry,Atomic number of Carbon?,4,6,8,12,b,medium
+Chemistry,NaCl is?,Sugar,Salt,Pepper,Spice,b,easy
+Chemistry,PH of water?,5,6,7,8,c,medium
+Chemistry,Acid PH level?,<7,>7,7,0,a,medium
+Chemistry,Base PH level?,<7,>7,7,14,b,medium
+Chemistry,Symbol for Gold?,Ag,Au,Fe,Cu,b,hard
+Chemistry,Symbol for Silver?,Ag,Au,Fe,Cu,a,hard
+Biology,Powerhouse of cell?,Nucleus,Ribosome,Mitochondria,Lysosome,c,medium
+Biology,Human chromosomes pairs?,21,22,23,24,c,medium
+Biology,Largest organ?,Heart,Lever,Skin,Brain,c,medium
+Biology,Red blood cells carry?,Oxygen,Nitrogen,Sugar,Water,a,medium
+Biology,Study of plants?,Zoology,Botany,Geology,Ecology,b,medium
+Geography,Capital of Vietnam?,Hanoi,HCM,DaNang,Hue,a,easy
+Geography,Largest Ocean?,Atlantic,Indian,Arctic,Pacific,d,easy
+Geography,Longest River?,Nile,Amazon,Yangtze,Mississippi,a,medium
+Geography,Tallest Mountain?,K2,Everest,Fuji,Kilimanjaro,b,easy
+Geography,Capital of USA?,NY,LA,Chicago,Washington DC,d,medium
+Geography,Capital of Japan?,Kyoto,Osaka,Tokyo,Seoul,c,medium
+Geography,Capital of France?,London,Paris,Rome,Berlin,b,easy
+IT,HTML stands for?,HyperText Markup Language,HighText Machine Language,None,Text Mode,a,easy
+IT,CPU stands for?,Central Process Unit,Central Processing Unit,Computer Personal Unit,None,b,easy
+IT,RAM stands for?,Random Access Memory,Read Access Memory,Run All Memory,None,a,easy
+IT,Python is?,Snake,Language,Car,City,b,easy
+IT,Binary is?,0-1,1-2,0-9,A-Z,a,medium
+IT,HTTP port?,21,22,80,443,c,hard
+IT,HTTPS port?,21,22,80,443,d,hard
+IT,1 Byte = ? bits,4,8,16,32,b,easy
+History,WW2 Ended?,1940,1945,1950,1955,b,medium
+History,First man on moon?,Armstrong,Aldrin,Gagarin,Collins,a,medium
+History,Vietnam Independence?,1945,1954,1975,1986,a,medium
+Language,Past of 'Go'?,Goed,Gone,Went,Going,c,easy
+Language,Plural of 'Child'?,Childs,Children,Childrens,Kids,b,easy
