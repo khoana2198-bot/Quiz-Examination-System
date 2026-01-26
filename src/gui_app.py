@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox, ttk, filedialog, simpledialog
-from datetime import date
+from datetime import date, datetime
+import calendar
 import database
 from models import User, Admin, Student, Subject, Question, Exam, Result
 from services import UserService, ExamService, ResultService, MasterDataService
@@ -131,7 +132,7 @@ class AdminDashboard(tk.Frame):
             ("Manage Subjects", self.show_subjects),
             ("Manage Questions", self.show_questions),
             ("Create Exam", self.show_create_exam),
-            ("Student Results", self.show_results),
+            ("Exam Management", self.show_exam_management),
         ]
         for text, cmd in menus:
             tk.Button(self.sidebar, text=text, command=cmd, font=("Arial", 11), bg="white", relief="flat", padx=10, pady=10).pack(fill="x", pady=5, padx=5)
@@ -142,7 +143,7 @@ class AdminDashboard(tk.Frame):
         self.content_area.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for F in (ManageSubjectsFrame, ManageQuestionsFrame, CreateExamFrame, TeacherResultsFrame):
+        for F in (ManageSubjectsFrame, ManageQuestionsFrame, CreateExamFrame, ExamManagementFrame):
             page_name = F.__name__
             frame = F(parent=self.content_area, controller=self.controller)
             self.frames[page_name] = frame
@@ -158,7 +159,7 @@ class AdminDashboard(tk.Frame):
     def show_subjects(self): self.switch_content("ManageSubjectsFrame")
     def show_questions(self): self.switch_content("ManageQuestionsFrame")
     def show_create_exam(self): self.switch_content("CreateExamFrame")
-    def show_results(self): self.switch_content("TeacherResultsFrame")
+    def show_exam_management(self): self.switch_content("ExamManagementFrame")
     
 class ManageSubjectsFrame(tk.Frame):
     def __init__(self, parent, controller):
@@ -298,26 +299,122 @@ class CreateExamFrame(tk.Frame):
         self.auto = AutoExamFrame(nb, controller); nb.add(self.auto, text="Auto")
     def on_show(self): self.manual.on_show(); self.auto.on_show()
 
+import calendar
+
+class DateTimePicker(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.output_frames = []
+        
+        # Variables
+        self.year_var = tk.StringVar()
+        self.month_var = tk.StringVar()
+        self.day_var = tk.StringVar()
+        self.hour_var = tk.StringVar()
+        self.minute_var = tk.StringVar()
+        
+        # Layout
+        # DD/MM/YYYY  -  HH:MM
+        
+        # Date
+        tk.Label(self, text="Date:").pack(side="left")
+        
+        self.cb_day = ttk.Combobox(self, textvariable=self.day_var, width=3, state="readonly")
+        self.cb_day.pack(side="left")
+        tk.Label(self, text="/").pack(side="left")
+        
+        self.cb_month = ttk.Combobox(self, textvariable=self.month_var, values=[f"{i:02d}" for i in range(1, 13)], width=3, state="readonly")
+        self.cb_month.pack(side="left")
+        tk.Label(self, text="/").pack(side="left")
+
+        current_year = datetime.now().year
+        years = [str(i) for i in range(current_year, current_year + 6)]
+        self.cb_year = ttk.Combobox(self, textvariable=self.year_var, values=years, width=5, state="readonly")
+        self.cb_year.pack(side="left")
+
+        # Time
+        tk.Label(self, text="  Time:").pack(side="left")
+        self.cb_hour = ttk.Combobox(self, textvariable=self.hour_var, values=[f"{i:02d}" for i in range(24)], width=3, state="readonly")
+        self.cb_hour.pack(side="left")
+        tk.Label(self, text=":").pack(side="left")
+        self.cb_minute = ttk.Combobox(self, textvariable=self.minute_var, values=[f"{i:02d}" for i in range(60)], width=3, state="readonly")
+        self.cb_minute.pack(side="left", padx=(0, 10))
+        
+        # Bindings
+        self.cb_month.bind("<<ComboboxSelected>>", self.update_days)
+        self.cb_year.bind("<<ComboboxSelected>>", self.update_days)
+        
+        # Init Default
+        self.set_to_now()
+
+    def set_to_now(self):
+        now = datetime.now()
+        self.year_var.set(str(now.year))
+        self.month_var.set(f"{now.month:02d}")
+        self.update_days() # Populate days first
+        self.day_var.set(f"{now.day:02d}")
+        self.hour_var.set(f"{now.hour:02d}")
+        self.minute_var.set(f"{now.minute:02d}")
+
+    def update_days(self, event=None):
+        y = self.year_var.get()
+        m = self.month_var.get()
+        if not y or not m: return
+        
+        try:
+            _, num_days = calendar.monthrange(int(y), int(m))
+            days = [f"{i:02d}" for i in range(1, num_days + 1)]
+            self.cb_day['values'] = days
+            
+            # If current selection is invalid (e.g., 31st then switch to Feb), reset to 01
+            current = self.day_var.get()
+            if current and int(current) > num_days:
+                self.day_var.set("01")
+        except: pass
+
+    def get_datetime_str(self):
+        # Returns YYYY-MM-DD HH:MM:00
+        try:
+            return f"{self.year_var.get()}-{self.month_var.get()}-{self.day_var.get()} {self.hour_var.get()}:{self.minute_var.get()}:00"
+        except: return None
+
 class ManualExamFrame(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
-        self.grid_rowconfigure(1, weight=1); self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(2, weight=1); self.grid_columnconfigure(0, weight=1)
+        
         sf = tk.Frame(self); sf.pack(fill="x", pady=10)
-        tk.Label(sf, text="Name:").pack(side="left"); self.en = tk.Entry(sf); self.en.pack(side="left")
-        tk.Label(sf, text="Subject:").pack(side="left"); self.cb = ttk.Combobox(sf, state="readonly"); self.cb.pack(side="left"); self.cb.bind("<<ComboboxSelected>>", self.filt)
-        tk.Label(sf, text="Duration:").pack(side="left"); self.dr = tk.Entry(sf, width=5); self.dr.insert(0,"60"); self.dr.pack(side="left")
-        qa = tk.Frame(self); qa.pack(fill="both", expand=True)
+        tk.Label(sf, text="Name:").pack(side="left"); self.en = tk.Entry(sf); self.en.pack(side="left", padx=5)
+        tk.Label(sf, text="Subject:").pack(side="left"); self.cb = ttk.Combobox(sf, state="readonly", width=15); self.cb.pack(side="left", padx=5); self.cb.bind("<<ComboboxSelected>>", self.filt)
+        tk.Label(sf, text="Dur(min):").pack(side="left"); self.dr = tk.Entry(sf, width=5); self.dr.insert(0,"60"); self.dr.pack(side="left", padx=5)
+        
+        # Date Pickers
+        df = tk.Frame(self); df.pack(fill="x", pady=5)
+        
+        tk.Label(df, text="Start:").grid(row=0, column=0, padx=5, sticky="e")
+        self.start_picker = DateTimePicker(df)
+        self.start_picker.grid(row=0, column=1, padx=5, sticky="w")
+        
+        tk.Label(df, text="End:").grid(row=1, column=0, padx=5, sticky="e")
+        self.end_picker = DateTimePicker(df)
+        self.end_picker.grid(row=1, column=1, padx=5, sticky="w")
+
+        qa = tk.Frame(self); qa.pack(fill="both", expand=True, pady=10)
         self.pool = tk.Listbox(qa, selectmode=tk.EXTENDED); self.pool.pack(side="left", fill="both", expand=True)
         md = tk.Frame(qa); md.pack(side="left")
         tk.Button(md, text=">>", command=self.add_q).pack(); tk.Button(md, text="<<", command=self.rem_q).pack()
         self.sel = tk.Listbox(qa, selectmode=tk.EXTENDED); self.sel.pack(side="left", fill="both", expand=True)
-        tk.Button(self, text="Create", command=self.crt, bg="#4CAF50", fg="white", font=BTN_FONT).pack(pady=10)
+        tk.Button(self, text="Create Exam (Draft)", command=self.crt, bg="#4CAF50", fg="white", font=BTN_FONT).pack(pady=10)
         self.p_list, self.s_list = [], []
+
     def on_show(self):
         self.subs = self.controller.master_service.get_all_subjects()
         self.cb['values'] = [s.subject_name for s in self.subs]
         if self.subs: self.cb.current(0); self.filt()
+        if hasattr(self, 'start_picker'): self.start_picker.set_to_now()
+        if hasattr(self, 'end_picker'): self.end_picker.set_to_now()
+
     def filt(self, e=None):
         s = next((x for x in self.subs if x.subject_name == self.cb.get()), None)
         if not s: return
@@ -337,11 +434,38 @@ class ManualExamFrame(tk.Frame):
         to_move = [self.s_list[i] for i in ids]
         for i in reversed(ids): del self.s_list[i]
         self.p_list.extend(to_move); self.refs()
+
     def crt(self):
         s = next((x for x in self.subs if x.subject_name == self.cb.get()), None)
+        name = self.en.get().strip()
+        dur = self.dr.get().strip()
+        
+        # Validation
+        if not name:
+            messagebox.showwarning("Validation", "Exam Name is required")
+            return
+        if not dur.isdigit() or int(dur) <= 0:
+            messagebox.showwarning("Validation", "Duration must be a positive number")
+            return
+        if not self.s_list:
+            messagebox.showwarning("Validation", "Please select at least one question")
+            return
+            
         try:
-            self.controller.exam_service.create_exam(self.controller.current_user, s, self.en.get(), int(self.dr.get()), self.s_list)
-            messagebox.showinfo("OK", "Exam Created"); self.filt()
+            start_d = self.start_picker.get_datetime_str()
+            end_d = self.end_picker.get_datetime_str()
+            
+            if start_d and end_d and start_d > end_d:
+                messagebox.showwarning("Validation", "Start Date must be before End Date")
+                return
+            
+            self.controller.exam_service.create_exam(
+                self.controller.current_user, s, name, int(dur), self.s_list,
+                start_date=start_d, end_date=end_d
+            )
+            messagebox.showinfo("OK", "Exam Created (Status: Draft)"); self.filt()
+            self.s_list = []; self.refs(); self.en.delete(0, tk.END)
+            self.start_picker.set_to_now(); self.end_picker.set_to_now()
         except Exception as e: messagebox.showerror("Error", str(e))
 
 class AutoExamFrame(tk.Frame):
@@ -349,55 +473,323 @@ class AutoExamFrame(tk.Frame):
         super().__init__(parent)
         self.controller = controller
         f = tk.Frame(self); f.place(relx=0.5, rely=0.3, anchor="center")
-        tk.Label(f, text="Auto Exam Creation", font=("Arial",14)).grid(row=0, columnspan=2)
+        tk.Label(f, text="Auto Exam Creation", font=("Arial",14)).grid(row=0, columnspan=2, pady=10)
+        
+        # Simple fields
         ls = ["Name:","Subject:","Duration:","Easy:","Medium:","Hard:"]
         self.ws = {}
         for i,t in enumerate(ls):
-            tk.Label(f, text=t).grid(row=i+1, column=0, sticky="e")
+            tk.Label(f, text=t).grid(row=i+1, column=0, sticky="e", pady=5)
             w = ttk.Combobox(f, state="readonly") if "Subject" in t else tk.Entry(f)
-            w.grid(row=i+1, column=1); self.ws[t] = w
+            w.grid(row=i+1, column=1, pady=5); self.ws[t] = w
+        
         self.ws["Duration:"].insert(0,"60")
-        tk.Button(f, text="Generate", command=self.gen, bg="#673AB7", fg="white", font=BTN_FONT).grid(row=10, columnspan=2, pady=20)
+        
+        # Date Pickers
+        row_offset = len(ls) + 1
+        tk.Label(f, text="Start Date:").grid(row=row_offset, column=0, sticky="e", pady=5)
+        self.start_picker = DateTimePicker(f)
+        self.start_picker.grid(row=row_offset, column=1, pady=5, sticky="w")
+        
+        tk.Label(f, text="End Date:").grid(row=row_offset+1, column=0, sticky="e", pady=5)
+        self.end_picker = DateTimePicker(f)
+        self.end_picker.grid(row=row_offset+1, column=1, pady=5, sticky="w")
+
+        tk.Button(f, text="Generate (Draft)", command=self.gen, bg="#673AB7", fg="white", font=BTN_FONT).grid(row=row_offset+2, columnspan=2, pady=20)
+        
     def on_show(self):
         self.subs = self.controller.master_service.get_all_subjects()
         self.ws["Subject:"]['values'] = [s.subject_name for s in self.subs]
         if self.subs: self.ws["Subject:"].current(0)
+        if hasattr(self, 'start_picker'): self.start_picker.set_to_now()
+        if hasattr(self, 'end_picker'): self.end_picker.set_to_now()
+        
     def gen(self):
         s = next((x for x in self.subs if x.subject_name == self.ws["Subject:"].get()), None)
+        name = self.ws["Name:"].get().strip()
+        dur = self.ws["Duration:"].get().strip()
+        e_c = self.ws["Easy:"].get().strip() or "0"
+        m_c = self.ws["Medium:"].get().strip() or "0"
+        h_c = self.ws["Hard:"].get().strip() or "0"
+
+        # Validation
+        if not name:
+             messagebox.showwarning("Validation", "Exam Name is required")
+             return
+        if not dur.isdigit() or int(dur) <= 0:
+             messagebox.showwarning("Validation", "Duration must be a positive number")
+             return
+        if not (e_c.isdigit() and m_c.isdigit() and h_c.isdigit()):
+             messagebox.showwarning("Validation", "Question counts must be numbers")
+             return
+        if int(e_c) + int(m_c) + int(h_c) <= 0:
+             messagebox.showwarning("Validation", "Total questions must be > 0")
+             return
+
         try:
+            sd = self.start_picker.get_datetime_str()
+            ed = self.end_picker.get_datetime_str()
+            
+            if sd and ed and sd > ed:
+                messagebox.showwarning("Validation", "Start Date must be before End Date")
+                return
+            
             self.controller.exam_service.create_auto_exam(
-                self.controller.current_user, s, self.ws["Name:"].get(), int(self.ws["Duration:"].get()),
-                int(self.ws["Easy:"].get()), int(self.ws["Medium:"].get()), int(self.ws["Hard:"].get())
+                self.controller.current_user, s, name, int(dur),
+                int(e_c), int(m_c), int(h_c),
+                start_date=sd, end_date=ed
             )
-            messagebox.showinfo("OK", "Created")
+            messagebox.showinfo("OK", "Created (Status: Draft)")
         except Exception as e: messagebox.showerror("Error", str(e))
 
-class TeacherResultsFrame(tk.Frame):
+class ExamManagementFrame(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
-        tk.Label(self, text="Student Results", font=("Arial", 16, "bold")).pack(pady=10)
-        self.tree = ttk.Treeview(self, columns=("st","ex","sub","sc","tm"), show="headings")
-        for c,t in zip(("st","ex","sub","sc","tm"), ("Student","Exam","Subject","Score","Time")): self.tree.heading(c, text=t)
-        self.tree.pack(fill="both", expand=True, padx=20)
-        f = tk.Frame(self); f.pack(pady=10)
-        tk.Button(f, text="View Details", command=self.view, font=BTN_FONT).pack(side="left", padx=5)
-        tk.Button(f, text="Delete Result", command=self.delete, bg="#F44336", fg="white", font=BTN_FONT).pack(side="left", padx=5)
-        tk.Button(f, text="Refresh", command=self.load, font=BTN_FONT).pack(side="left", padx=5)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        
+        tk.Label(self, text="Exam Management", font=("Arial", 16, "bold")).grid(row=0, column=0, pady=10)
+        
+        self.tree = ttk.Treeview(self, columns=("id", "nm", "sub", "st", "sd", "ed"), show="headings")
+        self.tree.heading("id", text="STT"); self.tree.column("id", width=50) # Changed from ID to STT
+        self.tree.heading("nm", text="Name")
+        self.tree.heading("sub", text="Subject")
+        self.tree.heading("st", text="Status")
+        self.tree.heading("sd", text="Start")
+        self.tree.heading("ed", text="End")
+        
+        self.tree.grid(row=1, column=0, sticky="nsew", padx=10)
+        
+        btn_f = tk.Frame(self)
+        btn_f.grid(row=2, column=0, pady=10)
+        tk.Button(btn_f, text="Refresh", command=self.load, font=BTN_FONT).pack(side="left", padx=5)
+        tk.Button(btn_f, text="View Details / Results", command=self.view, bg="#2196F3", fg="white", font=BTN_FONT).pack(side="left", padx=5)
+        tk.Button(btn_f, text="Edit Exam", command=self.edit, bg="#FF9800", fg="white", font=BTN_FONT).pack(side="left", padx=5)
+        tk.Button(btn_f, text="Delete Exam", command=self.delete, bg="#F44336", fg="white", font=BTN_FONT).pack(side="left", padx=5)
 
     def on_show(self): self.load()
     def load(self):
         for i in self.tree.get_children(): self.tree.delete(i)
-        self.res = self.controller.result_service.get_all_results()
-        for i,r in enumerate(self.res): self.tree.insert("", "end", iid=i, values=(r.student_name, r.exam_name, r.subject_name, f"{r.score:.1f}", r.submit_time))
+        self.exams = self.controller.exam_service.get_all_exams_for_admin()
+        for idx, e in enumerate(self.exams, 1):
+            self.tree.insert("", "end", iid=e.exam_id, values=(idx, e.exam_name, e.subject_name, e.status.upper(), e.start_date or "-", e.end_date or "-"))
+            
     def view(self):
-        if not self.tree.selection(): return
-        ReviewWindow(self.controller, self.res[int(self.tree.selection()[0])].result_id)
+        sel = self.tree.selection()
+        if not sel: return
+        exam_id = int(sel[0])
+        exam = next((x for x in self.exams if x.exam_id == exam_id), None)
+        if exam: ExamDetailWindow(self.controller, exam, self.load)
+
+    def edit(self):
+        sel = self.tree.selection()
+        if not sel: return
+        exam_id = int(sel[0])
+        exam = next((x for x in self.exams if x.exam_id == exam_id), None)
+        if not exam: return
+        
+        # Determine subject to fetch all possible questions
+        # We need to know the subject_id, but exam object might only have subject_name if loaded from get_all_exams_for_admin
+        # We need the real subject object or ID.
+        # Let's find the subject object from master_service based on name
+        all_subs = self.controller.master_service.get_all_subjects()
+        real_sub = next((s for s in all_subs if s.subject_name == exam.subject_name), None)
+        
+        if not real_sub:
+             messagebox.showerror("Error", "Associated Subject not found")
+             return
+
+        # Fetch question IDs currently in this exam
+        conn = database.get_connection()
+        c = conn.cursor()
+        c.execute("SELECT question_id FROM exam_details WHERE exam_id=?",(exam.exam_id,))
+        current_q_ids = [r[0] for r in c.fetchall()]
+        conn.close()
+        
+        # Fetch all questions for this subject (to have full objects)
+        all_qs = self.controller.master_service.get_questions_by_subject(real_sub.subject_id)
+        
+        # Filter to get the Question objects for this exam
+        exam.questions = [q for q in all_qs if q.question_id in current_q_ids]
+        
+        EditExamWindow(self.controller, exam, self.load)
+        
     def delete(self):
+        sel = self.tree.selection()
+        if not sel: return
+        if not messagebox.askyesno("Confirm", "Delete Exam? This will delete all student results/history for this exam."): return
+        try:
+            self.controller.exam_service.delete_exam(int(sel[0]))
+            self.load()
+        except Exception as e: messagebox.showerror("Error", str(e))
+
+class ExamDetailWindow(tk.Toplevel):
+    def __init__(self, controller, exam, on_close_cb):
+        super().__init__()
+        self.controller = controller
+        self.exam = exam
+        self.on_close_cb = on_close_cb
+        self.title(f"Exam Dashboard: {exam.exam_name}")
+        self.state('zoomed')
+        self.configure(bg="#F5F7FB") # Light dashboard background
+        
+        # Main container with padding
+        main_cont = tk.Frame(self, bg="#F5F7FB")
+        main_cont.pack(fill="both", expand=True, padx=30, pady=30)
+        
+        # 1. Header Section
+        header = tk.Frame(main_cont, bg="#F5F7FB")
+        header.pack(fill="x", pady=(0, 20))
+        
+        tk.Label(header, text=exam.exam_name, font=("Arial", 24, "bold"), bg="#F5F7FB", fg="#333").pack(side="left")
+        
+        # Status Badge
+        st_color = "#4CAF50" if exam.status == 'published' else "#FF9800" if exam.status == 'closed' else "#9E9E9E"
+        tk.Label(header, text=exam.status.upper(), font=("Arial", 10, "bold"), bg=st_color, fg="white", padx=10, pady=5).pack(side="left", padx=20)
+        
+        # Actions (Right aligned)
+        act_f = tk.Frame(header, bg="#F5F7FB")
+        act_f.pack(side="right")
+        
+        if exam.status == 'draft':
+            tk.Button(act_f, text="PUBLISH EXAM", command=self.publish, bg="#4CAF50", fg="white", font=("Arial", 10, "bold"), padx=15, pady=8, relief="flat").pack(side="left", padx=5)
+        elif exam.status == 'published':
+            tk.Button(act_f, text="CLOSE EXAM", command=self.close_exam, bg="#F44336", fg="white", font=("Arial", 10, "bold"), padx=15, pady=8, relief="flat").pack(side="left", padx=5)
+        elif exam.status == 'closed':
+            tk.Button(act_f, text="REOPEN EXAM", command=self.reopen_exam, bg="#FF9800", fg="white", font=("Arial", 10, "bold"), padx=15, pady=8, relief="flat").pack(side="left", padx=5)
+
+
+        # 2. Stats Cards
+        stats_frame = tk.Frame(main_cont, bg="#F5F7FB")
+        stats_frame.pack(fill="x", pady=20)
+        stats_frame.grid_columnconfigure(0, weight=1)
+        stats_frame.grid_columnconfigure(1, weight=1)
+        stats_frame.grid_columnconfigure(2, weight=1)
+        stats_frame.grid_columnconfigure(3, weight=1)
+        
+        self.stat_vars = {
+            "total": tk.StringVar(value="0"),
+            "avg": tk.StringVar(value="0"),
+            "high": tk.StringVar(value="0"),
+            "low": tk.StringVar(value="0")
+        }
+        
+        self.create_card(stats_frame, 0, "Total Participants", self.stat_vars["total"])
+        self.create_card(stats_frame, 1, "Average Score", self.stat_vars["avg"])
+        self.create_card(stats_frame, 2, "Highest Score", self.stat_vars["high"], val_color="#4CAF50")
+        self.create_card(stats_frame, 3, "Lowest Score", self.stat_vars["low"], val_color="#F44336")
+        
+        # 3. Results Section
+        res_frame = tk.Frame(main_cont, bg="white", padx=20, pady=20) # Card look
+        res_frame.pack(fill="both", expand=True)
+        
+        rf_header = tk.Frame(res_frame, bg="white")
+        rf_header.pack(fill="x", pady=(0, 15))
+        tk.Label(rf_header, text="Student Results", font=("Arial", 16, "bold"), bg="white").pack(side="left")
+        
+        # List Actions
+        tk.Button(rf_header, text="Export Report", command=self.export_report, font=("Arial", 10), bg="#E0E0E0", relief="flat", padx=10, pady=5).pack(side="right", padx=5)
+        tk.Button(rf_header, text="Review Selected", command=self.review, font=("Arial", 10), bg="#E0E0E0", relief="flat", padx=10, pady=5).pack(side="right", padx=5)
+        tk.Button(rf_header, text="Delete Result", command=self.del_res, font=("Arial", 10), bg="#FFEBEE", fg="#D32F2F", relief="flat", padx=10, pady=5).pack(side="right", padx=5)
+
+        # Treeview
+        style = ttk.Style()
+        style.configure("Treeview.Heading", font=("Arial", 10, "bold"), padding=10)
+        style.configure("Treeview", font=("Arial", 11), rowheight=30)
+        
+        self.tree = ttk.Treeview(res_frame, columns=("id", "st", "sc", "tm"), show="headings", selectmode="browse")
+        self.tree.heading("id", text="#"); self.tree.column("id", width=50, anchor="center")
+        self.tree.heading("st", text="Student Name"); self.tree.column("st", width=300)
+        self.tree.heading("sc", text="Score"); self.tree.column("sc", width=100, anchor="center")
+        self.tree.heading("tm", text="Submission Time"); self.tree.column("tm", width=200)
+        
+        self.tree.pack(fill="both", expand=True)
+        
+        self.load_results()
+        
+    def create_card(self, parent, col, title, var, val_color="#212121"):
+        card = tk.Frame(parent, bg="white", padx=20, pady=20)
+        card.grid(row=0, column=col, sticky="ew", padx=10)
+        
+        tk.Label(card, text=title, font=("Arial", 10), fg="#757575", bg="white").pack(anchor="w")
+        tk.Label(card, textvariable=var, font=("Arial", 24, "bold"), fg=val_color, bg="white").pack(anchor="w", pady=(5, 0))
+
+    def update_status(self, st):
+        try:
+            self.controller.exam_service.update_exam_status(self.exam.exam_id, st)
+            messagebox.showinfo("OK", f"Exam {st.upper()}")
+            if self.on_close_cb: self.on_close_cb()
+            self.destroy()
+        except Exception as e: messagebox.showerror("Error", str(e))
+        
+    def publish(self): self.update_status('published')
+    def close_exam(self): self.update_status('closed')
+    
+    def reopen_exam(self):
+        # Check dates
+        now = datetime.now()
+        end = datetime.strptime(self.exam.end_date, "%Y-%m-%d %H:%M:%S")
+        if now > end:
+            messagebox.showwarning("Cannot Reopen", "Current time is past the End Date.\nPlease Edit the exam to extend the End Date first.")
+            return
+        self.update_status('published')
+
+    def load_results(self):
+        for i in self.tree.get_children(): self.tree.delete(i)
+        self.res = self.controller.result_service.get_results_by_exam_id(self.exam.exam_id)
+        
+        scores = []
+        for i,r in enumerate(self.res, 1):
+            self.tree.insert("", "end", iid=i-1, values=(i, r.student_name, f"{r.score:.1f}", r.submit_time))
+            try: scores.append(float(r.score))
+            except: pass
+            
+        # Update Stats
+        self.stat_vars["total"].set(str(len(scores)))
+        if scores:
+            self.stat_vars["avg"].set(f"{sum(scores)/len(scores):.2f}")
+            self.stat_vars["high"].set(f"{max(scores):.1f}")
+            self.stat_vars["low"].set(f"{min(scores):.1f}")
+        else:
+            self.stat_vars["avg"].set("0")
+            self.stat_vars["high"].set("0")
+            self.stat_vars["low"].set("0")
+
+    def export_report(self):
+        if not self.res: return messagebox.showinfo("Info", "No results to export")
+        
+        f_path = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV Files", "*.csv")])
+        if not f_path: return
+        
+        try:
+            import csv
+            with open(f_path, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                writer.writerow(["Exam Report", self.exam.exam_name])
+                writer.writerow(["Total Participants", self.stat_vars["total"].get()])
+                writer.writerow(["Average Score", self.stat_vars["avg"].get()])
+                writer.writerow(["Highest Score", self.stat_vars["high"].get()])
+                writer.writerow(["Lowest Score", self.stat_vars["low"].get()])
+                writer.writerow([])
+                writer.writerow(["#", "Student Name", "Score", "Submission Time"])
+                
+                for i, r in enumerate(self.res, 1):
+                    writer.writerow([i, r.student_name, r.score, r.submit_time])
+            messagebox.showinfo("Success", "Report exported successfully!")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to export: {e}")
+
+    def review(self):
+        sel = self.tree.selection()
+        if not sel: return
+        ReviewWindow(self.controller, self.res[int(sel[0])].result_id)
+        
+    def del_res(self):
         sel = self.tree.selection()
         if not sel or not messagebox.askyesno("Confirm", "Delete Result?"): return
         self.controller.result_service.delete_result(self.res[int(sel[0])].result_id)
-        self.load()
+        self.load_results()
 
 class StudentDashboard(tk.Frame):
     def __init__(self, parent, controller):
@@ -465,37 +857,113 @@ class ExamWindow(tk.Toplevel):
         self.saved = state["saved_answers"]
         
         self.title(f"Exam: {exam.exam_name}")
-        self.geometry("800x600")
+        self.state('zoomed') # Maximize
+        self.bind("<Escape>", lambda e: self.attributes("-fullscreen", False))
         
-        self.timer_lbl = tk.Label(self, text="Time Left: --:--", font=("Arial", 14, "bold"), fg="red")
-        self.timer_lbl.pack(pady=10)
+        # Header
+        header = tk.Frame(self, bg="#EEE", height=60, padx=20)
+        header.pack(fill="x")
+        tk.Label(header, text=f"{exam.exam_name}", font=("Arial", 16, "bold"), bg="#EEE").pack(side="left")
         
-        container = tk.Frame(self)
-        container.pack(fill="both", expand=True, padx=20)
-        canvas = tk.Canvas(container); sb = ttk.Scrollbar(container, command=canvas.yview)
-        sf = tk.Frame(canvas); canvas.create_window((0,0), window=sf, anchor="nw")
-        canvas.configure(yscrollcommand=sb.set); canvas.pack(side="left", fill="both", expand=True); sb.pack(side="right", fill="y")
-        sf.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
-
+        self.timer_lbl = tk.Label(header, text="--:--", font=("Arial", 16, "bold"), fg="red", bg="#EEE")
+        self.timer_lbl.pack(side="left", expand=True) # Center timer
+        
+        self.prog_lbl = tk.Label(header, text="0 / 0", font=("Arial", 14), bg="#EEE")
+        self.prog_lbl.pack(side="right")
+        
+        # Main Canvas Area
+        self.canvas = tk.Canvas(self)
+        self.sb = ttk.Scrollbar(self, command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=self.sb.set)
+        
+        self.sb.pack(side="right", fill="y")
+        self.canvas.pack(side="left", fill="both", expand=True)
+        
+        # Center Frame inside Canvas
+        self.center_frame = tk.Frame(self.canvas)
+        # Fix: Anchor 'n' centers at X coord. X should be width/2.
+        self.canvas_window = self.canvas.create_window((0, 0), window=self.center_frame, anchor="n")
+        
+        # Bindings for resizing and scrolling
+        self.center_frame.bind("<Configure>", self.on_frame_configure)
+        self.canvas.bind("<Configure>", self.on_canvas_configure)
+        self.bind_all("<MouseWheel>", self._on_mousewheel)
+        
+        # Content
         self.vars = {}
+        self.qs_frames = {}
+        
+        # Padding wrapper for visual centering
+        self.content_wrapper = tk.Frame(self.center_frame, padx=50, pady=20)
+        self.content_wrapper.pack(fill="both", expand=True)
+
         for idx, q in enumerate(exam.questions):
-            f = tk.LabelFrame(sf, text=f"Q{idx+1}: {q.content}", font=("Arial", 11, "bold"))
-            f.pack(fill="x", padx=5, pady=10)
+            f = tk.LabelFrame(self.content_wrapper, text=f"Question {idx+1}", font=("Arial", 12, "bold"), padx=10, pady=10)
+            f.pack(fill="x", pady=15)
+            self.qs_frames[q.question_id] = f
+            
+            tk.Label(f, text=q.content, font=("Arial", 14), wraplength=800, justify="left").pack(anchor="w", pady=(0, 10))
             
             val = self.saved.get(q.question_id, "none")
             var = tk.StringVar(value=val)
             self.vars[q.question_id] = var
             
-            def on_click(qid=q.question_id, v=var):
+            def on_click(qid=q.question_id, v=var, fr=f):
                 self.controller.result_service.save_answer_progress(self.result_id, qid, v.get())
+                self.update_progress()
+                fr.config(bg="#E3F2FD") 
 
             for opt in ('a','b','c','d'):
-                rb = tk.Radiobutton(f, text=f"{opt.upper()}. {getattr(q, 'option_'+opt)}", variable=var, value=opt, command=on_click, font=("Arial", 11))
-                rb.pack(anchor="w", padx=10)
+                txt = getattr(q, 'option_'+opt)
+                rb = tk.Radiobutton(f, text=f"{opt.upper()}. {txt}", variable=var, value=opt, command=on_click, font=("Arial", 12))
+                rb.pack(anchor="w", padx=20, pady=2)
+            
+            if val != "none": f.config(bg="#E3F2FD")
+                
+        tk.Button(self.content_wrapper, text="FINISH & SUBMIT", command=self.submit, bg="#4CAF50", fg="white", font=("Arial", 14, "bold"), pady=15, width=30).pack(pady=40)
         
-        tk.Button(sf, text="Finish & Submit", command=self.submit, bg="#4CAF50", fg="white", font=BTN_FONT, pady=10).pack(pady=20)
+        # Anti-Cheat Bindings
+        self.bind("<Control-c>", lambda e: "break")
+        self.bind("<Control-v>", lambda e: "break")
+        self.bind("<Control-x>", lambda e: "break")
+        self.bind("<Control-a>", lambda e: "break")
+        self.bind("<Button-3>", lambda e: "break") # Right click
+        
+        self.violation_count = 0
+        self.bind("<FocusOut>", self.on_focus_loss)
         
         self.update_timer()
+        self.update_progress()
+
+    def on_frame_configure(self, event):
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        
+    def on_canvas_configure(self, event):
+        width = event.width
+        self.canvas.coords(self.canvas_window, width // 2, 0)
+        frame_w = min(width - 40, 1000) 
+        self.canvas.itemconfig(self.canvas_window, width=frame_w)
+        
+    def on_focus_loss(self, event):
+        # Prevent rapid firing checks if user is just clicking around mostly invalid
+        # But this event fires when window loses focus.
+        if self.attributes("-fullscreen"):
+             self.violation_count += 1
+             left = 3 - self.violation_count
+             if left <= 0:
+                 messagebox.showerror("Violation", "You have switched windows too many times.\nExam will be submitted automatically.")
+                 self.submit(force=True)
+             else:
+                 messagebox.showwarning("Warning", f"Do not switch windows during the exam!\nViolations: {self.violation_count}/3\nRemaining chances: {left}")
+                 self.focus_force() # Bring back
+
+    def _on_mousewheel(self, event):
+        self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+
+    def update_progress(self):
+        done = sum(1 for v in self.vars.values() if v.get() != "none")
+        total = len(self.exam.questions)
+        self.prog_lbl.config(text=f"Completed: {done} / {total}")
 
     def update_timer(self):
         if self.remaining <= 0:
@@ -504,12 +972,17 @@ class ExamWindow(tk.Toplevel):
             return
         
         m, s = divmod(int(self.remaining), 60)
-        self.timer_lbl.config(text=f"Time Left: {m:02d}:{s:02d}")
+        self.timer_lbl.config(text=f"{m:02d}:{s:02d}")
         self.remaining -= 1
         self.after(1000, self.update_timer)
 
     def submit(self, force=False):
-        if not force and not messagebox.askyesno("Submit", "Finish exam?"): return
+        if not force:
+            done = sum(1 for v in self.vars.values() if v.get() != "none")
+            total = len(self.exam.questions)
+            if not messagebox.askyesno("Submit", f"You have answered {done}/{total} questions.\nFinish exam?"): return
+            
+        self.unbind_all("<MouseWheel>")
         res = self.controller.result_service.finish_exam(self.result_id, self.exam)
         messagebox.showinfo("Done", f"Score: {res.score:.1f}")
         self.destroy()
@@ -561,6 +1034,138 @@ class ReviewWindow(tk.Toplevel):
                         prefix = " [YOUR ANSWER]" 
 
                 tk.Label(f, text=f"{opt_key.upper()}. {opt_text} {prefix}", fg=lbl_fg, font=lbl_font, bg=color).pack(anchor="w", padx=10)
+
+class EditExamWindow(tk.Toplevel):
+    def __init__(self, controller, exam, on_close_cb):
+        super().__init__()
+        self.controller = controller
+        self.exam = exam
+        self.on_close_cb = on_close_cb
+        self.title(f"Edit Exam: {exam.exam_name}")
+        self.geometry("900x700")
+        
+        # Determine subject (need object)
+        subs = self.controller.master_service.get_all_subjects()
+        self.subject = next((s for s in subs if s.subject_name == exam.subject_name), None)
+        
+        # Reuse logic is hard with inheritance because of layout differences, so we rebuild UI
+        # Top: Meta
+        tf = tk.Frame(self, padx=10, pady=10)
+        tf.pack(fill="x")
+        
+        tk.Label(tf, text="Name:").pack(side="left")
+        self.en_name = tk.Entry(tf, width=30, font=("Arial", 11)); self.en_name.pack(side="left", padx=5)
+        self.en_name.insert(0, exam.exam_name)
+        
+        tk.Label(tf, text="Duration(min):").pack(side="left", padx=10)
+        self.en_dur = tk.Entry(tf, width=5, font=("Arial", 11)); self.en_dur.pack(side="left")
+        self.en_dur.insert(0, str(exam.duration))
+        
+        # Dates
+        df = tk.Frame(self, padx=10, pady=5); df.pack(fill="x")
+        tk.Label(df, text="Start:").pack(side="left")
+        self.start_picker = DateTimePicker(df); self.start_picker.pack(side="left", padx=5)
+        
+        tk.Label(df, text="End:").pack(side="left", padx=10)
+        self.end_picker = DateTimePicker(df); self.end_picker.pack(side="left", padx=5)
+        
+        # Pre-fill dates
+        self.set_picker(self.start_picker, exam.start_date)
+        self.set_picker(self.end_picker, exam.end_date)
+        
+        # Questions
+        qf = tk.Frame(self, padx=10, pady=10); qf.pack(fill="both", expand=True)
+        
+        # Pool (Left)
+        lf = tk.LabelFrame(qf, text=f"Available Questions ({exam.subject_name})"); lf.pack(side="left", fill="both", expand=True)
+        sb1 = ttk.Scrollbar(lf); self.lb_pool = tk.Listbox(lf, selectmode=tk.EXTENDED, yscrollcommand=sb1.set)
+        sb1.config(command=self.lb_pool.yview)
+        sb1.pack(side="right", fill="y"); self.lb_pool.pack(side="left", fill="both", expand=True)
+        
+        # Buttons (Center)
+        bf = tk.Frame(qf, padx=5); bf.pack(side="left")
+        tk.Button(bf, text=">>", command=self.add_q).pack(pady=5)
+        tk.Button(bf, text="<<", command=self.rem_q).pack(pady=5)
+        
+        # Selected (Right)
+        rf = tk.LabelFrame(qf, text="Selected Questions"); rf.pack(side="left", fill="both", expand=True)
+        sb2 = ttk.Scrollbar(rf); self.lb_sel = tk.Listbox(rf, selectmode=tk.EXTENDED, yscrollcommand=sb2.set)
+        sb2.config(command=self.lb_sel.yview)
+        sb2.pack(side="right", fill="y"); self.lb_sel.pack(side="left", fill="both", expand=True)
+        
+        # Save
+        tk.Button(self, text="SAVE CHANGES", command=self.save, bg="#4CAF50", fg="white", font=BTN_FONT, pady=10).pack(pady=10)
+        
+        # Init Lists
+        self.s_list = exam.questions # Already active
+        self.p_list = []
+        if self.subject:
+            all_qs = self.controller.master_service.get_questions_by_subject(self.subject.subject_id)
+            # Filter out already selected
+            sel_ids = [q.question_id for q in self.s_list]
+            self.p_list = [q for q in all_qs if q.question_id not in sel_ids]
+            
+        self.refresh_lists()
+        
+    def set_picker(self, picker, dt_str):
+        if not dt_str: return
+        try:
+            # Expect YYYY-MM-DD HH:MM:SS
+            dt = datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S")
+            picker.year_var.set(str(dt.year))
+            picker.month_var.set(f"{dt.month:02d}")
+            picker.update_days()
+            picker.day_var.set(f"{dt.day:02d}")
+            picker.hour_var.set(f"{dt.hour:02d}")
+            picker.minute_var.set(f"{dt.minute:02d}")
+        except: pass
+
+    def refresh_lists(self):
+        self.lb_pool.delete(0, tk.END); self.lb_sel.delete(0, tk.END)
+        for q in self.p_list: self.lb_pool.insert(tk.END, q.content)
+        for q in self.s_list: self.lb_sel.insert(tk.END, q.content)
+
+    def add_q(self):
+        ids = self.lb_pool.curselection()
+        to_move = [self.p_list[i] for i in ids]
+        for i in reversed(ids): del self.p_list[i]
+        self.s_list.extend(to_move); self.refresh_lists()
+
+    def rem_q(self):
+        ids = self.lb_sel.curselection()
+        to_move = [self.s_list[i] for i in ids]
+        for i in reversed(ids): del self.s_list[i]
+        self.p_list.extend(to_move); self.refresh_lists()
+
+    def save(self):
+        name = self.en_name.get().strip()
+        dur = self.en_dur.get().strip()
+        
+        if not name: messagebox.showwarning("Val", "Name required"); return
+        if not dur.isdigit() or int(dur) <= 0: messagebox.showwarning("Val", "Duration > 0"); return
+        if not self.s_list: messagebox.showwarning("Val", "Select > 0 questions"); return
+        
+        sd = self.start_picker.get_datetime_str()
+        ed = self.end_picker.get_datetime_str()
+        if sd and ed and sd > ed: messagebox.showwarning("Val", "Start <= End"); return
+        
+        try:
+            self.controller.exam_service.update_exam(
+                self.exam.exam_id, name, int(dur), self.s_list, sd, ed
+            )
+            
+            # Auto-Reopen Logic
+            if self.exam.status == 'closed':
+                 now = datetime.now()
+                 end_dt = datetime.strptime(ed, "%Y-%m-%d %H:%M:%S")
+                 if now < end_dt:
+                     if messagebox.askyesno("Reopen?", "The new End Date is in the future.\nDo you want to Reopen this exam now?"):
+                         self.controller.exam_service.update_exam_status(self.exam.exam_id, 'published')
+            
+            messagebox.showinfo("OK", "Exam Updated")
+            self.on_close_cb()
+            self.destroy()
+        except Exception as e: messagebox.showerror("Error", str(e))
 
 if __name__ == "__main__":
     try:

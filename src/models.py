@@ -52,12 +52,16 @@ class Question:
 
 
 class Exam:
-    def __init__(self, exam_id: int, subject_id: int, exam_name: str, duration: int, created_by: int):
+    def __init__(self, exam_id: int, subject_id: int, exam_name: str, duration: int, created_by: int, 
+                 start_date: str = None, end_date: str = None, status: str = 'draft'):
         self.exam_id = exam_id
         self.subject_id = subject_id
         self.exam_name = exam_name
         self.duration = duration  # in minutes
         self.created_by = created_by
+        self.start_date = start_date
+        self.end_date = end_date
+        self.status = status
         self.questions: List[Question] = [] # Can satisfy ExamDetails logic by ordering this list
 
     def add_question(self, question: Question):

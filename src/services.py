@@ -197,12 +197,15 @@ class MasterDataService:
             conn.close()
 
 class ExamService:
-    def create_exam(self, admin: Admin, subject: Subject, name: str, duration: int, questions: List[Question]):
+    def create_exam(self, admin: Admin, subject: Subject, name: str, duration: int, questions: List[Question], 
+                    start_date: str = None, end_date: str = None):
         conn = get_connection()
         cursor = conn.cursor()
         try:
-            cursor.execute("INSERT INTO exams (subject_id, exam_name, duration, created_by) VALUES (?, ?, ?, ?)",
-                           (subject.subject_id, name, duration, admin.user_id))
+            cursor.execute("""
+                INSERT INTO exams (subject_id, exam_name, duration, created_by, start_date, end_date, status) 
+                VALUES (?, ?, ?, ?, ?, ?, 'draft')
+            """, (subject.subject_id, name, duration, admin.user_id, start_date, end_date))
             exam_id = cursor.lastrowid
             
             details = [(exam_id, q.question_id) for q in questions]
@@ -216,7 +219,8 @@ class ExamService:
             conn.close()
 
     def create_auto_exam(self, admin: Admin, subject: Subject, name: str, duration: int, 
-                         count_easy: int, count_medium: int, count_hard: int):
+                         count_easy: int, count_medium: int, count_hard: int,
+                         start_date: str = None, end_date: str = None):
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT question_id, difficulty_level FROM questions WHERE subject_id = ?", (subject.subject_id,))
@@ -243,8 +247,10 @@ class ExamService:
         conn = get_connection()
         cursor = conn.cursor()
         try:
-            cursor.execute("INSERT INTO exams (subject_id, exam_name, duration, created_by) VALUES (?, ?, ?, ?)",
-                           (subject.subject_id, name, duration, admin.user_id))
+            cursor.execute("""
+                INSERT INTO exams (subject_id, exam_name, duration, created_by, start_date, end_date, status) 
+                VALUES (?, ?, ?, ?, ?, ?, 'draft')
+            """, (subject.subject_id, name, duration, admin.user_id, start_date, end_date))
             exam_id = cursor.lastrowid
             
             details = [(exam_id, qid) for qid in selected_ids]
@@ -257,16 +263,76 @@ class ExamService:
         finally:
             conn.close()
 
+    def update_exam(self, exam_id: int, name: str, duration: int, questions: List[Question], start_date: str = None, end_date: str = None):
+        conn = get_connection()
+        try:
+            conn.execute("""
+                UPDATE exams 
+                SET exam_name = ?, duration = ?, start_date = ?, end_date = ? 
+                WHERE exam_id = ?
+            """, (name, duration, start_date, end_date, exam_id))
+            
+            # Update questions: Remove old, Add new (Simplest way)
+            conn.execute("DELETE FROM exam_details WHERE exam_id = ?", (exam_id,))
+            
+            details = [(exam_id, q.question_id) for q in questions]
+            conn.executemany("INSERT INTO exam_details (exam_id, question_id) VALUES (?, ?)", details)
+            
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()
+
+    def update_auto_statuses(self):
+        conn = get_connection()
+        now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        try:
+            # Draft -> Published
+            conn.execute("UPDATE exams SET status = 'published' WHERE status = 'draft' AND start_date IS NOT NULL AND start_date <= ?", (now_str,))
+            # Published -> Closed
+            conn.execute("UPDATE exams SET status = 'closed' WHERE status = 'published' AND end_date IS NOT NULL AND end_date <= ?", (now_str,))
+            conn.commit()
+        except: pass
+        finally: conn.close()
+
     def get_exams_by_subject(self, subject_id: int) -> List[Exam]:
+        self.update_auto_statuses()
+        """
+        For STUDENTS: Only return exams that are:
+        1. Published
+        2. Within start_date and end_date (if set)
+        """
         conn = get_connection()
         cursor = conn.cursor()
         
-        cursor.execute("SELECT exam_id, subject_id, exam_name, duration, created_by FROM exams WHERE subject_id = ?", (subject_id,))
+        # Use space separator to match DateTimePicker format (YYYY-MM-DD HH:MM:SS)
+        now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # We handle date logic in Python or SQL. SQL is cleaner but need to handle NULLs carefully.
+        # SQLite doesn't have standard GREATEST/LEAST in all versions, 
+        # but standard comparisons with string ISO dates work.
+        # Logic: 
+        # status = 'published'
+        # AND (start_date IS NULL OR start_date <= now)
+        # AND (end_date IS NULL OR end_date >= now)
+        
+        query = """
+            SELECT exam_id, subject_id, exam_name, duration, created_by, start_date, end_date, status 
+            FROM exams 
+            WHERE subject_id = ? 
+              AND status = 'published'
+              AND (start_date IS NULL OR start_date <= ?)
+              AND (end_date IS NULL OR end_date >= ?)
+        """
+        
+        cursor.execute(query, (subject_id, now_str, now_str))
         exam_rows = cursor.fetchall()
         
         exams = []
         for r in exam_rows:
-            e = Exam(r[0], r[1], r[2], r[3], r[4])
+            e = Exam(r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7])
             cursor.execute("""
                 SELECT q.question_id, q.subject_id, q.content, q.option_a, q.option_b, q.option_c, q.option_d, q.correct_answer, q.difficulty_level
                 FROM questions q
@@ -280,6 +346,64 @@ class ExamService:
             
         conn.close()
         return exams
+
+    def get_all_exams_for_admin(self) -> List[Exam]:
+        self.update_auto_statuses()
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT e.exam_id, e.subject_id, e.exam_name, e.duration, e.created_by, 
+                   e.start_date, e.end_date, e.status, s.subject_name
+            FROM exams e
+            JOIN subjects s ON e.subject_id = s.subject_id
+            ORDER BY e.exam_id DESC
+        """)
+        rows = cursor.fetchall()
+        
+        exams = []
+        for r in rows:
+            # We can attach subject_name dynamically if needed or just rely on IDs, 
+            # but for display it's nice to have subject name. 
+            # The Model doesn't have it, so we'll tack it on.
+            e = Exam(r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7])
+            e.subject_name = r[8]
+            exams.append(e)
+            
+        conn.close()
+        return exams
+
+    def update_exam_status(self, exam_id: int, new_status: str):
+        valid_statuses = ['draft', 'published', 'closed']
+        if new_status not in valid_statuses:
+            raise ValueError(f"Invalid status: {new_status}")
+            
+        conn = get_connection()
+        conn.execute("UPDATE exams SET status = ? WHERE exam_id = ?", (new_status, exam_id))
+        conn.commit()
+        conn.close()
+        
+    def delete_exam(self, exam_id: int):
+        conn = get_connection()
+        try:
+            conn.execute("DELETE FROM exam_details WHERE exam_id = ?", (exam_id,))
+            conn.execute("DELETE FROM results WHERE exam_id = ?", (exam_id,)) # Also delete associated results? Or keep them? User said "chi tiết xóa như cái menu student result luôn", implies deleting exam deletes everything or is capable of it. Let's assume cascade or manual delete.
+            # Ideally we shouldn't delete results if we want history, but if the user deletes the exam, it's gone.
+            # To be safe and clean:
+            cursor = conn.cursor()
+            cursor.execute("SELECT result_id FROM results WHERE exam_id = ?", (exam_id,))
+            res_rows = cursor.fetchall()
+            for (rid,) in res_rows:
+                conn.execute("DELETE FROM result_details WHERE result_id = ?", (rid,))
+            
+            conn.execute("DELETE FROM results WHERE exam_id = ?", (exam_id,))
+            conn.execute("DELETE FROM exams WHERE exam_id = ?", (exam_id,))
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()
 
 class ResultService:
     def start_exam(self, student: Student, exam: Exam) -> Dict:
@@ -410,6 +534,31 @@ class ResultService:
             history.append(res)
         return history
 
+    def get_results_by_exam_id(self, exam_id: int) -> List[Result]:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT r.result_id, r.exam_id, r.student_id, r.score, r.submit_time, 
+                   e.exam_name, s.subject_name, u.full_name, r.status
+            FROM results r
+            JOIN exams e ON r.exam_id = e.exam_id
+            JOIN subjects s ON e.subject_id = s.subject_id
+            JOIN users u ON r.student_id = u.user_id
+            WHERE r.status = 'completed' AND r.exam_id = ?
+            ORDER BY r.submit_time DESC
+        """, (exam_id,))
+        rows = cursor.fetchall()
+        conn.close()
+        
+        history = []
+        for r in rows:
+            res = Result(r[0], r[1], r[2], r[3], r[4])
+            res.exam_name = r[5]
+            res.subject_name = r[6]
+            res.student_name = r[7]
+            history.append(res)
+        return history
+
     def get_all_results(self) -> List[Result]:
         conn = get_connection()
         cursor = conn.cursor()
@@ -440,9 +589,10 @@ class ResultService:
         cursor = conn.cursor()
         
         cursor.execute("""
-            SELECT r.result_id, r.exam_id, r.student_id, r.score, r.submit_time, e.exam_name
+            SELECT r.result_id, r.exam_id, r.student_id, r.score, r.submit_time, e.exam_name, s.subject_name
             FROM results r
             JOIN exams e ON r.exam_id = e.exam_id
+            JOIN subjects s ON e.subject_id = s.subject_id
             WHERE r.result_id = ?
         """, (result_id,))
         row = cursor.fetchone()
@@ -452,6 +602,7 @@ class ResultService:
         
         result = Result(row[0], row[1], row[2], row[3], row[4])
         result.exam_name = row[5]
+        result.subject_name = row[6]
         
         cursor.execute("""
             SELECT rd.result_detail_id, rd.question_id, rd.selected_answer, rd.is_correct,

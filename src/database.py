@@ -5,13 +5,17 @@ from datetime import datetime
 DB_NAME = os.path.join(os.path.dirname(os.path.abspath(__file__)), "quiz_app.db")
 
 def get_connection():
-    return sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(DB_NAME, check_same_thread=False)
+    conn.execute("PRAGMA journal_mode=WAL;")  # Enable Write-Ahead Logging for concurrency
+    conn.execute("PRAGMA busy_timeout = 30000;") # Wait up to 30s if locked
+    conn.execute("PRAGMA foreign_keys = ON;")
+    return conn
 
 def init_db():
     conn = get_connection()
     cursor = conn.cursor()
     
-    cursor.execute("PRAGMA foreign_keys = ON")
+    # PRAGMA foreign_keys is now set in get_connection()
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
@@ -57,10 +61,19 @@ def init_db():
         exam_name TEXT NOT NULL,
         duration INTEGER NOT NULL,
         created_by INTEGER NOT NULL,
+        start_date TEXT,
+        end_date TEXT,
+        status TEXT DEFAULT 'draft',
         FOREIGN KEY (subject_id) REFERENCES subjects (subject_id),
         FOREIGN KEY (created_by) REFERENCES users (user_id)
     )
     """)
+    try: cursor.execute("ALTER TABLE exams ADD COLUMN start_date TEXT")
+    except: pass
+    try: cursor.execute("ALTER TABLE exams ADD COLUMN end_date TEXT")
+    except: pass
+    try: cursor.execute("ALTER TABLE exams ADD COLUMN status TEXT DEFAULT 'draft'")
+    except: pass
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS exam_details (
