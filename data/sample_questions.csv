@@ -1,0 +1,236 @@
+Subject,Question Content,Option A,Option B,Option C,Option D,Correct Answer,Difficulty
+Mathematics,2 + 2 = ?,3,4,5,6,b,easy
+Mathematics,5 * 5 = ?,20,25,30,35,b,easy
+Mathematics,Square root of 144?,10,11,12,13,c,medium
+Mathematics,10 / 2 = ?,3,4,5,6,c,easy
+Mathematics,15 - 7 = ?,6,7,8,9,c,easy
+Mathematics,3 squared?,6,9,12,15,b,easy
+Mathematics,Angle of a circle?,90,180,270,360,d,easy
+Mathematics,Pi approx value?,3.14,2.14,4.14,3.41,a,medium
+Mathematics,Sides in a triangle?,2,3,4,5,b,easy
+Mathematics,Sides in a square?,3,4,5,6,b,easy
+Physics,Water boils at (C)?,90,100,110,120,b,easy
+Physics,Freezing point of water (C)?,0,10,-10,100,a,easy
+Physics,Speed of sound (m/s)?,343,300,500,1000,a,hard
+Physics,Speed of light (km/s)?,300000,150000,1000,340,a,hard
+Physics,Unit of Force?,Newton,Joule,Watt,Volt,a,medium
+Physics,Unit of Energy?,Newton,Joule,Watt,Volt,b,medium
+Physics,Unit of Power?,Newton,Joule,Watt,Volt,c,medium
+Physics,Gravity on Earth (m/s^2)?,9.8,8.9,10.5,5.6,a,medium
+Physics,Law of Action-Reaction?,Newton 1st,Newton 2nd,Newton 3rd,Einstein,c,medium
+Physics,E=mc^2 scientist?,Bohr,Einstein,Newton,Tesla,b,easy
+Chemistry,Symbol for Hydrogen?,Hy,H,Ho,He,b,easy
+Chemistry,Symbol for Oxygen?,O,Ox,Og,On,a,easy
+Chemistry,H2O is?,Salt,Water,Acid,Base,b,easy
+Chemistry,Atomic number of Carbon?,4,6,8,12,b,medium
+Chemistry,NaCl is?,Sugar,Salt,Pepper,Spice,b,easy
+Chemistry,PH of water?,5,6,7,8,c,medium
+Chemistry,Acid PH level?,<7,>7,7,0,a,medium
+Chemistry,Base PH level?,<7,>7,7,14,b,medium
+Chemistry,Symbol for Gold?,Ag,Au,Fe,Cu,b,hard
+Chemistry,Symbol for Silver?,Ag,Au,Fe,Cu,a,hard
+Biology,Powerhouse of cell?,Nucleus,Ribosome,Mitochondria,Lysosome,c,medium
+Biology,Human chromosomes pairs?,21,22,23,24,c,medium
+Biology,Largest organ?,Heart,Lever,Skin,Brain,c,medium
+Biology,Red blood cells carry?,Oxygen,Nitrogen,Sugar,Water,a,medium
+Biology,Study of plants?,Zoology,Botany,Geology,Ecology,b,medium
+Geography,Capital of Vietnam?,Hanoi,HCM,DaNang,Hue,a,easy
+Geography,Largest Ocean?,Atlantic,Indian,Arctic,Pacific,d,easy
+Geography,Longest River?,Nile,Amazon,Yangtze,Mississippi,a,medium
+Geography,Tallest Mountain?,K2,Everest,Fuji,Kilimanjaro,b,easy
+Geography,Capital of USA?,NY,LA,Chicago,Washington DC,d,medium
+Geography,Capital of Japan?,Kyoto,Osaka,Tokyo,Seoul,c,medium
+Geography,Capital of France?,London,Paris,Rome,Berlin,b,easy
+IT,HTML stands for?,HyperText Markup Language,HighText Machine Language,None,Text Mode,a,easy
+IT,CPU stands for?,Central Process Unit,Central Processing Unit,Computer Personal Unit,None,b,easy
+IT,RAM stands for?,Random Access Memory,Read Access Memory,Run All Memory,None,a,easy
+IT,Python is?,Snake,Language,Car,City,b,easy
+IT,Binary is?,0-1,1-2,0-9,A-Z,a,medium
+IT,HTTP port?,21,22,80,443,c,hard
+IT,HTTPS port?,21,22,80,443,d,hard
+IT,1 Byte = ? bits,4,8,16,32,b,easy
+History,WW2 Ended?,1940,1945,1950,1955,b,medium
+History,First man on moon?,Armstrong,Aldrin,Gagarin,Collins,a,medium
+History,Vietnam Independence?,1945,1954,1975,1986,a,medium
+Language,Past of 'Go'?,Goed,Gone,Went,Going,c,easy
+Language,Plural of 'Child'?,Childs,Children,Childrens,Kids,b,easy
+Python Programming,Output of print(2**3)?,6,8,9,5,b,easy
+Python Programming,Keyword for function?,func,def,define,fun,b,easy
+Python Programming,Comment character?,//,#,/*,--,b,easy
+Python Programming,Extension of Python file?,.pt,.py,.pyt,.pn,b,easy
+Python Programming,Boolean True value?,1,0,True,true,c,easy
+Python Programming,List definition?,(),[],{},<>,b,easy
+Python Programming,Tuple definition?,(),[],{},<>,a,easy
+Python Programming,Dictionary definition?,(),[],{},<>,c,easy
+Python Programming,Int division operator?,/,//,%,#,b,easy
+Python Programming,Modulus operator?,/,//,%,mod,c,easy
+Python Programming,String literal quote?,Single,Double,Triple,All of above,d,easy
+Python Programming,Variable name start?,Number,Underscore/Letter,Symbol,Space,b,easy
+Python Programming,Check type function?,typeof(),type(),class(),struct(),b,easy
+Python Programming,Convert string to int?,str(),int(),float(),char(),b,easy
+Python Programming,Input from user?,scan(),get(),input(),read(),c,easy
+Python Programming,Loop keyword?,foreach,loop,for,do,c,easy
+Python Programming,Which is immutable?,List,Set,Dictionary,Tuple,d,easy
+Python Programming,Logical AND?,&,&&,and,AND,c,easy
+Python Programming,Logical OR?,|,||,or,OR,c,easy
+Python Programming,Logical NOT?,!,not,~,inv,b,easy
+Python Programming,Length of list?,size(),count(),len(),length(),c,easy
+Python Programming,Add to list?,push(),add(),append(),insert(),c,easy
+Python Programming,Remove from list?,delete(),remove(),pop(),Both B&C,d,easy
+Python Programming,Range(5) output?,1-5,0-4,0-5,1-6,b,easy
+Python Programming,Indexing starts at?,1,0,-1,None,b,easy
+Python Programming,Negative index -1?,First,Middle,Last,Error,c,easy
+Python Programming,Slicing [::] means?,Reverse,Copy,Empty,Error,b,easy
+Python Programming,String concatenation?,+,&,.,concat,a,easy
+Python Programming,Repeat string?,*,+,^,rep,a,easy
+Python Programming,None type?,null,nil,None,void,c,easy
+Python Programming,List comprehension syntax?,[x for x in list],(x for x in list),{x for x in list},None,a,medium
+Python Programming,Lambda function?,Anonymous,Named,Class,Module,a,medium
+Python Programming,Global keyword?,globals,global,extern,var,b,medium
+Python Programming,x = {1, 2, 1}. len(x)?,3,2,1,Error,b,medium
+Python Programming,Set operations union?,+,&,|,.,c,medium
+Python Programming,Set operations intersection?,+,&,|,.,b,medium
+Python Programming,Dict keys must be?,Mutable,Immutable,Any,String only,b,medium
+Python Programming,Merge dicts (3.9+)?,+,&,|,update,c,medium
+Python Programming,*args type?,List,Tuple,Set,Dict,b,medium
+Python Programming,**kwargs type?,List,Tuple,Set,Dict,d,medium
+Python Programming,Decorator uses?,@,#,$,%,a,medium
+Python Programming,Yield keyword?,Return,Generator,Stop,Pause,b,medium
+Python Programming,__init__ is?,Method,Constructor,Destructor,Class,b,medium
+Python Programming,self refers to?,Class,Instance,Method,Global,b,medium
+Python Programming,Error handling block?,try-catch,do-catch,try-except,try-error,c,medium
+Python Programming,Finally runs?,On success,On error,Always,Never,c,medium
+Python Programming,Raise exception?,throw,raise,error,catch,b,medium
+Python Programming,Open file mode 'w'?,Read,Write,Append,Create,b,medium
+Python Programming,Open file mode 'a'?,Read,Write,Append,Create,c,medium
+Python Programming,Context manager?,with,using,use,context,a,medium
+Python Programming,String split default?,Comma,Space,Tab,Newline,b,medium
+Python Programming,String strip?,Remove all,Trim ends,Split,Join,b,medium
+Python Programming,Is string iterable?,Yes,No,Methods,None,a,medium
+Python Programming,range(1, 10, 2)?,1 3 5 7 9,1 2 3...9,2 4 6 8,1 2...10,a,medium
+Python Programming,zip() returns?,List,Tuple,Iterator,Dict,c,medium
+Python Programming,map() returns?,List,Map,Iterator,Dict,c,medium
+Python Programming,filter() keeps?,True,False,None,All,a,medium
+Python Programming,is vs ==?,Identity/Value,Value/Identity,Same,None,a,medium
+Python Programming,Ternary operator?,x ? y : z,if x then y else z,y if x else z,None,c,medium
+Python Programming,Pass keyword?,Stop,Skip,No-op,Continue,c,medium
+Python Programming,MRO stands for?,Method Run Order,Method Return Object,Method Resolution Order,Main Run Object,c,hard
+Python Programming,Metaclass is?,Class of class,Super class,Sub class,Abstract class,a,hard
+Python Programming,__new__ vs __init__?,Create/Init,Init/Create,Same,Destruct/Init,a,hard
+Python Programming,GIL prevents?,Multiprocessing,Multithreading CPU,I/O,Networking,b,hard
+Python Programming,Copy module shallow?,copy(),deepcopy(),clone(),dup(),a,hard
+Python Programming,Copy module deep?,copy(),deepcopy(),clone(),dup(),b,hard
+Python Programming,__str__ vs __repr__?,User/Dev,Dev/User,Same,Int/Str,a,hard
+Python Programming,Slot usage?,Memory Opt,Speed Opt,Security,Inheritance,a,hard
+Python Programming,Decorator stacking?,Top-down,Bottom-up,Random,Parallel,b,hard
+Python Programming,Abstract Base Class?,abc,def,class,interface,a,hard
+Python Programming,@staticmethod vs @classmethod?,No Self/Cls,Self/Cls,Same,None,a,hard
+Python Programming,Generator expression?,(),[],{},<>,a,hard
+Python Programming,__getitem__ makes?,Iterable,Subscriptable,Callable,Hashable,b,hard
+Python Programming,__call__ makes?,Iterable,Subscriptable,Callable,Hashable,c,hard
+Python Programming,Pickle module?,Sorting,Serialization,Hashing,Encryption,b,hard
+Python Programming,Single leading underscore?,Private convention,Strict Private,Public,Protected,a,hard
+Python Programming,Double leading underscore?,Name mangling,Private,Public,Protected,a,hard
+Python Programming,Monkey patching?,Runtime mod,Compile mod,Debug,Testing,a,hard
+Python Programming,Duck typing?,Behavior over Type,Type over Behavior,Static Typing,None,a,hard
+Python Programming,F-string introduced in?,3.5,3.6,3.7,3.8,b,hard
+Python Programming,Walrus operator?,:=,=,==,+=,a,hard
+Python Programming,Walrus operator version?,3.7,3.8,3.9,3.10,b,hard
+Python Programming,Async/Await library?,asyncio,thread,process,future,a,hard
+Python Programming,NumPy array vs List?,Faster/Less Mem,Slower/More Mem,Same,None,a,hard
+Python Programming,Pandas main object?,DataFrame,Table,Sheet,List,a,hard
+Python Programming,Virtualenv usage?,Isolation,Performance,Security,Backup,a,hard
+Python Programming,PIP stands for?,Pip Installs Packages,Python Install Pack,Package In Python,None,a,hard
+Python Programming,__name__ == '__main__'?,Run as script,Imported,Class init,None,a,hard
+Python Programming,Default mutable arg?,Dangerous,Safe,Recommended,Required,a,hard
+Python Programming,GC method?,Ref counting,Mark sweep,Generational,All above,d,hard
+Software Engineering,SDLC stands for?,System Design Life Cycle,Software Development Life Cycle,Software Design Life Cycle,System Development Life Cycle,b,easy
+Software Engineering,What is Agile?,Waterfall model,Iterative approach,Linear approach,Unstructured code,b,easy
+Software Engineering,Waterfall model is?,Iterative,Linear,Cyclic,Parallel,b,easy
+Software Engineering,Scrum is?,Programming Language,Framework for Agile,Database,Testing Tool,b,easy
+Software Engineering,Who is Scrum Master?,Project Manager,Developer,Facilitator,Client,c,easy
+Software Engineering,Unit Testing is?,Testing individual units,Testing whole system,Testing integration,Testing user acceptance,a,easy
+Software Engineering,Black box testing?,Code visible,Code hidden,Grey box,White box,b,easy
+Software Engineering,White box testing?,Code visible,Code hidden,Grey box,Black box,a,easy
+Software Engineering,Integration testing?,Units combined,System testing,Acceptance testing,Unit testing,a,easy
+Software Engineering,UML stands for?,Unified Modeling Language,United Modeling Language,Universal Modeling Language,Unique Modeling Language,a,easy
+Software Engineering,Actor in UML?,System,User/External system,Database,Process,b,easy
+Software Engineering,Use Case Diagram shows?,Class structure,System functionality,Data flow,State change,b,easy
+Software Engineering,Class Diagram shows?,System behavior,Static structure,Interaction,Data flow,b,easy
+Software Engineering,Sequence Diagram shows?,Object interaction over time,Class hierarchy,State transitions,Component dependency,a,easy
+Software Engineering,Version Control System?,IDE,Git,Compiler,Debugger,b,easy
+Software Engineering,Git commit does?,Saves changes to local repo,Uploads to remote,Deletes file,Merges branches,a,easy
+Software Engineering,GitHub is?,Git repository hosting,Compiler,Editor,Language,a,easy
+Software Engineering,Bug is?,Feature,Error/Flaw,Documentation,Test case,b,easy
+Software Engineering,Debugging is?,Finding and fixing bugs,Writing code,Designing,Testing,a,easy
+Software Engineering,SRS stands for?,Software Requirement Specification,System Requirement Specification,Software Requirement Sheet,System Requirement Sheet,a,easy
+Software Engineering,Functional Requirement?,What system does,How system performs,Cost,Timeline,a,easy
+Software Engineering,Non-functional Requirement?,What system does,Performance/Security,User stories,Features,b,easy
+Software Engineering,MVC stands for?,Model View Controller,Model View Component,Model Visual Controller,Main View Controller,a,easy
+Software Engineering,Cohesion should be?,High,Low,Medium,Zero,a,easy
+Software Engineering,Coupling should be?,High,Low,Medium,Infinite,b,easy
+Software Engineering,DRY principle?,Do Repeat Yourself,Don't Repeat Yourself,Do Right Yourself,Don't Right Yourself,b,easy
+Software Engineering,KISS principle?,Keep It Simple Stupid,Keep It Smart Simple,Know It Simple Stupid,Keep It Super Simple,a,easy
+Software Engineering,Refactoring is?,Changing behavior,Improving structure,Adding feature,Fixing bug,b,easy
+Software Engineering,Design Pattern is?,Specific code,Reusable solution,Library,Framework,b,easy
+Software Engineering,Open Source means?,Paid software,Source code available,Closed source,Proprietary,b,easy
+Software Engineering,Solid Principles count?,4,5,6,3,b,medium
+Software Engineering,S in SOLID?,Single Responsibility,Simple Responsibility,Static Responsibility,Standard Responsibility,a,medium
+Software Engineering,O in SOLID?,Open/Closed,Object Oriented,Only Closed,Open Class,a,medium
+Software Engineering,L in SOLID?,Liskov Substitution,List Substitution,Logic Substitution,Linear Substitution,a,medium
+Software Engineering,I in SOLID?,Interface Segregation,Interface Separation,Inheritance Segregation,Inheritance Separation,a,medium
+Software Engineering,D in SOLID?,Dependency Inversion,Dependency Injection,Data Inversion,Data Injection,a,medium
+Software Engineering,Singleton pattern?,One instance,Multiple instances,No instance,Static class,a,medium
+Software Engineering,Factory pattern?,Creates objects,Destroys objects,Manages db,Tests code,a,medium
+Software Engineering,Observer pattern?,One-to-many dependency,Many-to-many,One-to-one,No dependency,a,medium
+Software Engineering,Facade pattern?,Simplified interface,Complex interface,Hidden interface,No interface,a,medium
+Software Engineering,Adapter pattern?,Incompatible interfaces work together,Connects db,Connects network,Connects user,a,medium
+Software Engineering,TDD stands for?,Test Driven Development,Test Design Development,Technical Design Development,Test Debug Development,a,medium
+Software Engineering,TDD cycle?,Refactor-Red-Green,Red-Green-Refactor,Green-Red-Refactor,Refactor-Green-Red,b,medium
+Software Engineering,CI/CD stands for?,Continuous Integration/Deployment,Continuous Improvement/Design,Code Integration/Code Design,None,a,medium
+Software Engineering,DevOps combines?,Dev and Ops,Dev and Test,Ops and QA,Dev and Design,a,medium
+Software Engineering,Kanban is?,Visual workflow,Linear process,Code standard,Testing tool,a,medium
+Software Engineering,Sprint usually lasts?,1-4 weeks,1-4 days,1-4 months,1-4 years,a,medium
+Software Engineering,User Story format?,As a [role], I want [feature], As a [user], I need [code], As a [dev], I write [code], None,a,medium
+Software Engineering,Acceptance Criteria?,Conditions for done,Code comments,Design docs,Test names,a,medium
+Software Engineering,Technical Debt?,Future fix cost,Financial debt,Bug count,Line count,a,medium
+Software Engineering,Code Review purpose?,Find bugs/Improve quality,Criticize dev,Slow down,Waste time,a,medium
+Software Engineering,Pair Programming?,Two devs one machine,Two machines one dev,One dev one tester,None,a,medium
+Software Engineering,Monolithic Arch?,Single unit,Microservices,Distributed,Serverless,a,medium
+Software Engineering,Microservices Arch?,Small independent services,One big service,Database only,Frontend only,a,medium
+Software Engineering,API stands for?,Application Programming Interface,App Program Interconnect,App Process Interface,App Protocol Interface,a,medium
+Software Engineering,REST API uses?,HTTP methods,FTP,SMTP,Telnet,a,medium
+Software Engineering,JSON stands for?,JavaScript Object Notation,Java Standard Object,Java Source Object,JavaScript Online Notation,a,medium
+Software Engineering,XML stands for?,Extensible Markup Language,Extra Markup Language,External Markup Language,Example Markup Language,a,medium
+Software Engineering,SQL injection is?,Security vulnerability,Database feature,Query optimization,Data import,a,medium
+Software Engineering,XSS stands for?,Cross Site Scripting,Cross Site Style,Extra Site Scripting,Extra Site Style,a,medium
+Software Engineering,Brooks's Law?,Adding manpower to late project makes it later,More people = faster,Small teams are bad,Planning is useless,a,hard
+Software Engineering,Cyclomatic Complexity measures?,Code paths/Complexity,Line count,Variable count,Comment count,a,hard
+Software Engineering,Big O Notation measures?,Algorithm efficiency,Code length,Variable size,Compilation time,a,hard
+Software Engineering,Deadlock is?,Processes waiting efficiently,Processes waiting indefinitely,Process termination,Process creation,b,hard
+Software Engineering,Race Condition is?,Timing dependent error,Fast code,Optimized code,Slow code,a,hard
+Software Engineering,Idempotent method?,Multiple calls = same result,Multiple calls = diff result,Single call only,No result,a,hard
+Software Engineering,CAP Theorem?,Consistency Availability Partition,Consistency Accuracy Partition,Code Availability Partition,Code Accuracy Partition,a,hard
+Software Engineering,ACID properties?,Atomicity Consistency Isolation Durability,Atomicity Code Isolation Data,All Code Is Done,None,a,hard
+Software Engineering,Normal forms are for?,Database Normalization,Code Formatting,UI Design,Testing,a,hard
+Software Engineering,Dependency Injection?,Inversion of Control,Tight Coupling,Hard coding,Global variables,a,hard
+Software Engineering,Law of Demeter?,Principle of Least Knowledge,More knowledge,Talk to strangers,Global access,a,hard
+Software Engineering,YAGNI stands for?,You Ain't Gonna Need It,You Are Gonna Need It,You Also Get No It,Yes A Great New Idea,a,hard
+Software Engineering,Mock object used for?,Simulating behavior in tests,Production code,Database,UI,a,hard
+Software Engineering,Stub vs Mock?,State verification vs Behavior verification,Same,None,Mock is real,b,hard
+Software Engineering,Regression Testing?,ensure new changes didn't break old,Testing new features,Unit testing,Load testing,a,hard
+Software Engineering,Smoke Testing?,Basic stability check,Fire safety,Performance test,Security test,a,hard
+Software Engineering,Alpha Testing?,Internal acceptance testing,Public testing,Developer testing,Unit testing,a,hard
+Software Engineering,Beta Testing?,External user testing,Internal testing,Automated testing,Unit testing,a,hard
+Software Engineering,Code coverage?,Percent of code executed by tests,Lines of code,Number of files,Number of bugs,a,hard
+Software Engineering,Static Analysis?,Analyzing code without execution,Running code,Debugging,Testing,a,hard
+Software Engineering,Dynamic Analysis?,Analyzing code during execution,Reading code,Compiling,Linting,a,hard
+Software Engineering,Load Testing?,Testing system under load,Testing logic,Testing UI,Testing security,a,hard
+Software Engineering,Stress Testing?,Testing beyond limits,Testing limits,Testing stability,Testing speed,a,hard
+Software Engineering,Profiling?,Measuring performance,Editing code,Designing,Documenting,a,hard
+Software Engineering,Memory Leak?,Failure to release memory,Low memory,Fast memory,Disk error,a,hard
+Software Engineering,Segfault?,Accessing restricted memory,Disk error,Network error,CPU error,a,hard
+Software Engineering,Stack Overflow?,Stack memory exceeded,Heap exceeded,Disk full,Network timeout,a,hard
+Software Engineering,Heap memory is for?,Dynamic allocation,Static allocation,Code instructions,Global vars,a,hard
+Software Engineering,Stack memory is for?,Function calls/Local vars,Dynamic allocation,Large objects,Files,a,hard
+Software Engineering,Garbage Collection?,Automatic memory management,Manual memory,Trash can,File deletion,a,hard
